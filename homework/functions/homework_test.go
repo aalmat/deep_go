@@ -7,19 +7,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// В условии не указано, что нельзя модифицировать входной срез,
+// поэтому решил, что допустимо изменять его для оптимизации памяти.
 func Map(data []int, action func(int) int) []int {
-	// need to implement
-	return nil
+	for i := range data {
+		data[i] = action(data[i])
+	}
+	return data
 }
 
 func Filter(data []int, action func(int) bool) []int {
-	// need to implement
-	return nil
+	ind := 0
+	for i := range data {
+		if action(data[i]) {
+			data[ind] = data[i]
+			ind++
+		}
+	}
+	return data[:ind]
 }
 
 func Reduce(data []int, initial int, action func(int, int) int) int {
-	// need to implement
-	return 0
+	for i := range data {
+		initial = action(data[i], initial)
+	}
+	return initial
 }
 
 func TestMap(t *testing.T) {
