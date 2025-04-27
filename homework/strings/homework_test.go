@@ -10,15 +10,15 @@ import (
 )
 
 type COWBuffer struct {
-	data   []byte
-	refs   *int
-	closed bool
+	data []byte
+	refs *int
 }
 
 func NewCOWBuffer(data []byte) COWBuffer {
+	refs := 1
 	buf := COWBuffer{
 		data: data,
-		refs: new(int),
+		refs: &refs,
 	}
 
 	runtime.SetFinalizer(&buf, func(b *COWBuffer) {
@@ -36,17 +36,13 @@ func (b *COWBuffer) Clone() COWBuffer {
 }
 
 func (b *COWBuffer) Close() {
-	if b.closed {
-		return
-	}
-	b.closed = true
 	*b.refs--
 
 	runtime.SetFinalizer(b, nil)
 }
 
 func (b *COWBuffer) Update(index int, value byte) bool {
-	if b.closed || index < 0 || index >= len(b.data) {
+	if index < 0 || index >= len(b.data) {
 		return false
 	}
 	if *b.refs > 1 {
@@ -54,7 +50,6 @@ func (b *COWBuffer) Update(index int, value byte) bool {
 		copy(buf, b.data)
 		buf[index] = value
 		*b.refs--
-
 		*b = NewCOWBuffer(buf)
 	} else {
 		b.data[index] = value
@@ -64,9 +59,6 @@ func (b *COWBuffer) Update(index int, value byte) bool {
 }
 
 func (b *COWBuffer) String() string {
-	if b.closed {
-		return ""
-	}
 	return unsafe.String(unsafe.SliceData(b.data), len(b.data))
 }
 
