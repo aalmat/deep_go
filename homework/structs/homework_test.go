@@ -8,6 +8,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	// base mask
+	manaBitsSize   = 10
+	healthBitsSize = 10
+	houseBitsSize  = 1
+	gunBitsSize    = 1
+	familyBitsSize = 1
+	typeBitsSize   = 2
+
+	// skill mask
+	respectBitsSize    = 4
+	strengthBitsSize   = 4
+	experienceBitsSize = 4
+	levelBitsSize      = 4
+)
+
+const (
+	// base mask
+	manaBitsOffset   = 0
+	healthBitsOffset = 10
+	houseBitsOffset  = 20
+	gunBitsOffset    = 21
+	familyBitsOffset = 22
+	typeBitsOffset   = 23
+
+	// skill mask
+	respectBitsOffset    = 0
+	strengthBitsOffset   = 4
+	experienceBitsOffset = 8
+	levelBitsOffset      = 12
+)
+
 type Option func(*GamePerson)
 
 func WithName(name string) func(*GamePerson) {
@@ -32,61 +64,61 @@ func WithGold(gold int) func(*GamePerson) {
 
 func WithMana(mana int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(mana), 10, 0)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(mana), manaBitsSize, manaBitsOffset)
 	}
 }
 
 func WithHealth(health int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(health), 10, 10)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(health), healthBitsSize, healthBitsOffset)
 	}
 }
 
 func WithRespect(respect int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.skillMask = setBits[uint16](person.skillMask, uint16(respect), 4, 0)
+		person.skillMask = setBits[uint16](person.skillMask, uint16(respect), respectBitsSize, respectBitsOffset)
 	}
 }
 
 func WithStrength(strength int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.skillMask = setBits[uint16](person.skillMask, uint16(strength), 4, 4)
+		person.skillMask = setBits[uint16](person.skillMask, uint16(strength), strengthBitsSize, strengthBitsOffset)
 	}
 }
 
 func WithExperience(experience int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.skillMask = setBits[uint16](person.skillMask, uint16(experience), 4, 8)
+		person.skillMask = setBits[uint16](person.skillMask, uint16(experience), experienceBitsSize, experienceBitsOffset)
 	}
 }
 
 func WithLevel(level int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.skillMask = setBits[uint16](person.skillMask, uint16(level), 4, 12)
+		person.skillMask = setBits[uint16](person.skillMask, uint16(level), levelBitsSize, levelBitsOffset)
 	}
 }
 
 func WithHouse() func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(1), 1, 20)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(1), houseBitsSize, houseBitsOffset)
 	}
 }
 
 func WithGun() func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(1), 1, 21)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(1), gunBitsSize, gunBitsOffset)
 	}
 }
 
 func WithFamily() func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(1), 1, 22)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(1), familyBitsSize, familyBitsOffset)
 	}
 }
 
 func WithType(personType int) func(*GamePerson) {
 	return func(person *GamePerson) {
-		person.baseMask = setBits[uint32](person.baseMask, uint32(personType), 2, 23)
+		person.baseMask = setBits[uint32](person.baseMask, uint32(personType), typeBitsSize, typeBitsOffset)
 	}
 }
 
@@ -146,45 +178,45 @@ func (p *GamePerson) Gold() int {
 }
 
 func (p *GamePerson) Mana() int {
-	return int(getBits[uint32](p.baseMask, 10, 0))
+	return int(getBits[uint32](p.baseMask, manaBitsSize, manaBitsOffset))
 }
 
 func (p *GamePerson) Health() int {
-	return int(getBits[uint32](p.baseMask, 10, 10))
+	return int(getBits[uint32](p.baseMask, healthBitsSize, healthBitsOffset))
 }
 
 func (p *GamePerson) Respect() int {
-	return int(getBits[uint16](p.skillMask, 4, 0))
+	return int(getBits[uint16](p.skillMask, respectBitsSize, respectBitsOffset))
 }
 
 func (p *GamePerson) Strength() int {
-	return int(getBits[uint16](p.skillMask, 4, 4))
+	return int(getBits[uint16](p.skillMask, strengthBitsSize, strengthBitsOffset))
 }
 
 func (p *GamePerson) Experience() int {
-	return int(getBits[uint16](p.skillMask, 4, 8))
+	return int(getBits[uint16](p.skillMask, experienceBitsSize, experienceBitsOffset))
 
 }
 
 func (p *GamePerson) Level() int {
-	return int(getBits[uint16](p.skillMask, 4, 12))
+	return int(getBits[uint16](p.skillMask, levelBitsSize, levelBitsOffset))
 }
 
 func (p *GamePerson) HasHouse() bool {
-	return getBits[uint32](p.baseMask, 1, 20) == 1
+	return getBits[uint32](p.baseMask, houseBitsSize, houseBitsOffset) == 1
 
 }
 
 func (p *GamePerson) HasGun() bool {
-	return getBits[uint32](p.baseMask, 1, 21) == 1
+	return getBits[uint32](p.baseMask, gunBitsSize, gunBitsOffset) == 1
 }
 
 func (p *GamePerson) HasFamilty() bool {
-	return getBits[uint32](p.baseMask, 1, 22) == 1
+	return getBits[uint32](p.baseMask, familyBitsSize, familyBitsOffset) == 1
 }
 
 func (p *GamePerson) Type() int {
-	return int(getBits[uint32](p.baseMask, 2, 23))
+	return int(getBits[uint32](p.baseMask, typeBitsSize, typeBitsOffset))
 }
 
 func TestGamePerson(t *testing.T) {
