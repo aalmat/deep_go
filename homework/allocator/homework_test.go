@@ -11,21 +11,24 @@ import (
 // go test -v homework_test.go
 
 func Defragment(memory []byte, pointers []unsafe.Pointer) {
-	ind := 0
-	for i := range pointers {
-		val := (*byte)(pointers[i])
-		if *val == 0x00 || val == &memory[ind] {
+	memIdx, ptrIdx := 0, 0
+	for memIdx < len(memory) && ptrIdx < len(pointers) {
+		ptr := (*byte)(pointers[ptrIdx])
+		if *ptr == 0x00 {
+			ptrIdx++
 			continue
 		}
-		for ind < len(memory) {
-			if memory[ind] == 0x00 {
-				memory[ind], *val = *val, memory[ind]
-				pointers[i] = unsafe.Pointer(&memory[ind])
-				ind++
-				break
-			}
-			ind++
+
+		if ptr == &memory[memIdx] {
+			memIdx++
+			ptrIdx++
+			continue
 		}
+
+		memory[memIdx], *ptr = *ptr, memory[memIdx]
+		pointers[ptrIdx] = unsafe.Pointer(&memory[memIdx])
+		memIdx++
+		ptrIdx++
 	}
 }
 
